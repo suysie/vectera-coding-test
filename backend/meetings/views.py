@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from .models import Meeting, Note, Summary
 from .serializers import MeetingSerializer, NoteSerializer, SummarySerializer
+from .services.ai import summarize
 
 log = logging.getLogger(__name__)
 
@@ -14,44 +15,50 @@ def health(request):
     return Response({"status": "ok"}, status=status.HTTP_200_OK)
 
 class MeetingViewSet(viewsets.ModelViewSet):
-    """
-    TODO: Implement:
-    - list with pagination (newest first)
-    - retrieve (include latest summary if any)
-    - create
-    """
     queryset = Meeting.objects.all().annotate(note_count=Count("notes"))
     serializer_class = MeetingSerializer
 
     @action(detail=True, methods=["post"], url_path="notes")
     def add_note(self, request, pk=None):
-        """
-        TODO: Validate and create a Note for this meeting.
-        """
-        return Response({"detail": "TODO: implement add_note"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        meeting = self.get_object()
+        serializer = NoteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(meeting=meeting)
+            log.info("note_added", extra={"meeting_id": pk, "note_count": meeting.notes.count()})
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=["get"], url_path="notes")
     def list_notes(self, request, pk=None):
-        """
-        TODO: Return paginated notes, ordered oldest..newest.
-        """
-        return Response({"detail": "TODO: implement list_notes"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        meeting = self.get_object()
+        notes = meeting.notes.all()
+        serializer = NoteSerializer(notes, many=True)
+        return Response(serializer.data)
 
     @action(detail=True, methods=["post"], url_path="summarize")
     def summarize(self, request, pk=None):
-        """
-        TODO:
-        - Create or update a Summary with status 'pending'
-        - Simulate async job: concatenate notes, call services.ai.summarize, then set 'ready'/'failed'
-        - Log meeting_id and note_count
-        - Return 202 Accepted
-        """
-        log.info("summarize_requested", extra={"meeting_id": pk})
-        return Response({"detail": "TODO: implement summarize"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        meeting = self.get_object()
+        summary, created = Summary.objects.get_or_create(meeting=meeting, defaults={'status': Summary.PENDING})
+        
+        if created:
+            notes_text = " ".join([note.text for note in meeting.notes.all()])
+            try:
+                summary.content = summarize(notes_text)
+                summary.status = Summary.READY
+                log.info("summary_generated", extra={"meeting_id": pk, "note_count": meeting.notes.count()})
+            except Exception as e:
+                summary.status = Summary.FAILED
+                summary.content = f"Summary failed: {str(e)}"
+                log.error("summary_failed", extra={"meeting_id": pk, "error": str(e)})
+            summary.save()
+        
+        serializer = SummarySerializer(summary)
+        return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
 
     @action(detail=True, methods=["get"], url_path="summary")
     def get_summary(self, request, pk=None):
-        """
-        TODO: Return the summary or 404 if none.
-        """
-        return Response({"detail": "TODO: implement get_summary"}, status=status.HTTP_501_NOT_IMPLEMENTED)
+        meeting = self.get_object()
+        if not hasattr(meeting, 'summary') or meeting.summary is None:
+            return Response({"detail": "No summary available"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = SummarySerializer(meeting.summary)
+        return Response(serializer.data)

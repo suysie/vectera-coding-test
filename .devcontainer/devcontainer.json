@@ -1,0 +1,26 @@
+{
+  "name": "Vectera Coding Test",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "backend",
+  "workspaceFolder": "/app",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "forwardPorts": [8000, 4200, 5432],
+  "postCreateCommand": "apt-get update && apt-get install -y nodejs npm",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.django",
+        "angular.ng-template",
+        "bradlc.vscode-tailwindcss"
+      ]
+    }
+  },
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ]
+}
