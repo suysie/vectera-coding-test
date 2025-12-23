@@ -38,3 +38,4 @@ class Summary(models.Model):
 
     class Meta:
         ordering = ["-updated_at"]
+        
