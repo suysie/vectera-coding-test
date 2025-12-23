@@ -1,0 +1,39 @@
+.loading {
+        color: #666;
+        font-style: italic;
+    }
+
+    .error {
+        color: red;
+    }
+
+    .meetings-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .meeting-item {
+        margin: 1rem 0;
+        padding: 1rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    .meeting-item a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .note-count {
+        color: #666;
+        margin-left: 1rem;
+    }
+
+    .summary-badge {
+        margin-left: 1rem;
+        padding: 0.2rem 0.5rem;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        background: #e8f5e8;
+        color: #2e7d32;
+    }

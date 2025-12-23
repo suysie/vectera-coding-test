@@ -1,0 +1,76 @@
+.meeting-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+}
+
+.notes-section,
+.add-note,
+.summary-section {
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.note {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f9f9f9;
+    border-left: 4px solid #007bff;
+}
+
+.add-note input,
+.add-note textarea {
+    width: 100%;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-note button {
+    background: #007bff;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-note button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.summary-section button {
+    background: #28a745;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.summary-section button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.status-ready {
+    color: green;
+    font-weight: bold;
+}
+
+.status-pending {
+    color: orange;
+    font-weight: bold;
+}
+
+.summary-content {
+    background: #e8f5e8;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-top: 1rem;
+}

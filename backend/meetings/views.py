@@ -28,10 +28,10 @@ class MeetingViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=["get"], url_path="notes")
+    @action(detail=True, methods=["get"], url_path="notes-list")
     def list_notes(self, request, pk=None):
         meeting = self.get_object()
-        notes = meeting.notes.all()
+        notes = meeting.notes.all().order_by('created_at')
         serializer = NoteSerializer(notes, many=True)
         return Response(serializer.data)
 

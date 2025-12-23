@@ -1,0 +1,39 @@
+<div *ngIf="loading" class="loading">Loading meeting...</div>
+<div *ngIf="error" class="error">{{error}}</div>
+
+<div *ngIf="meeting" class="meeting-header">
+    <h2>{{meeting.title}}</h2>
+    <small>Started: {{meeting.started_at | date:'medium'}}</small>
+</div>
+
+<div class="notes-section">
+    <h3>Notes ({{notes.length}})</h3>
+    <div *ngFor="let note of notes" class="note">
+        <strong>{{note.author}}</strong> - {{note.created_at | date:'short'}}
+        <p>{{note.text}}</p>
+    </div>
+</div>
+
+<div class="add-note">
+    <h4>Add Note</h4>
+    <input [(ngModel)]="newNote.author" placeholder="Author" />
+    <textarea [(ngModel)]="newNote.text" placeholder="Note content" rows="3"></textarea>
+    <button (click)="addNote()" [disabled]="!newNote.text.trim()">Add Note</button>
+</div>
+
+<div class="summary-section">
+    <button (click)="generateSummary()" [disabled]="generatingSummary || summary?.status === 'ready'">
+        {{generatingSummary ? 'Generating...' : 'Generate Summary'}}
+    </button>
+
+    <div *ngIf="summaryLoading" class="loading">Loading summary...</div>
+    <div *ngIf="summary" class="summary">
+        <h4>Summary Status:
+            <span
+                [ngClass]="{'status-ready': summary.status === 'ready', 'status-pending': summary.status === 'pending'}">
+                {{summary.status.toUpperCase()}}
+            </span>
+        </h4>
+        <div *ngIf="summary.status === 'ready'" class="summary-content">{{summary.content}}</div>
+    </div>
+</div>

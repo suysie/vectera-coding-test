@@ -1,0 +1,15 @@
+<h2>Meetings ({{meetings.length}})</h2>
+<div *ngIf="loading" class="loading">Loading meetings...</div>
+<div *ngIf="error" class="error">{{error}}</div>
+<ul *ngIf="!loading && meetings.length" class="meetings-list">
+    <li *ngFor="let meeting of meetings" class="meeting-item">
+        <a [routerLink]="['/meetings', meeting.id]">
+            <strong>{{meeting.title}}</strong><br>
+            <small>{{meeting.started_at | date:'medium'}}</small>
+            <span class="note-count">({{meeting.note_count}} notes)</span>
+            <span *ngIf="meeting.latest_summary?.status === 'ready'" class="summary-badge">✅ Summary</span>
+        </a>
+    </li>
+</ul>
+<p *ngIf="!loading && !meetings.length">No meetings found. <a href="#"
+        (click)="createDemo(); $event.preventDefault()">Create demo meeting</a></p>
