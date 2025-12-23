@@ -22,12 +22,6 @@ jobs:
           docker compose run --rm backend python manage.py test meetings.tests.test_api  
           docker compose run --rm backend python manage.py test meetings.tests.test_validation
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'ignore'
-
       - name: Frontend Build ✅
         run: |
           cd frontend
