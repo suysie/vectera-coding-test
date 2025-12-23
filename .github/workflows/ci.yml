@@ -11,18 +11,18 @@ jobs:
 
       - name: Backend Tests
         run: |
-          # Start postgres service matching docker-compose.yml
-          docker run -d --name ci-db \
-            -e POSTGRES_DB=app \
-            -e POSTGRES_USER=app \
-            -e POSTGRES_PASSWORD=app \
-            -p 5432:5432 \
-            postgres:16
-            
-          # Wait for DB
-          sleep 15
+          # Start FULL stack (db + backend)
+          docker compose up -d db
+          sleep 20  # Wait for postgres
           
-          docker compose up --build backend --no-deps
+          # Run migrations
+          docker compose run --rm backend python manage.py migrate
+          
+          # Build & start backend
+          docker compose up --build backend -d
+          
+          # Wait for backend
+          sleep 10
           
           # Run tests
-          docker compose exec -T backend python manage.py test meetings.tests
+          docker compose exec backend python manage.py test meetings.tests
