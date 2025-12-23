@@ -11,18 +11,11 @@ jobs:
 
       - name: Backend Tests
         run: |
-          # Start FULL stack (db + backend)
+          # Start DB only
           docker compose up -d db
-          sleep 20  # Wait for postgres
+          sleep 20
           
           # Run migrations
           docker compose run --rm backend python manage.py migrate
           
-          # Build & start backend
-          docker compose up --build backend -d
-          
-          # Wait for backend
-          sleep 10
-          
-          # Run tests
-          docker compose exec backend python manage.py test meetings.tests
+          docker compose run --rm backend python manage.py test meetings.tests
