@@ -7,10 +7,25 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_USER: testuser
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
-      - name: TODO - Setup Python and run backend tests
+      - name: Setup Python and run backend tests
         run: |
-          echo "Intentionally failing CI to prompt candidates to fix workflow."
-          exit 1
+          pipx install docker-compose
+          docker-compose up -d postgres
+          docker-compose up --build backend
+          sleep 10
+          docker-compose exec -T backend python manage.py test meetings.tests
