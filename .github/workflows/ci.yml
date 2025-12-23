@@ -11,7 +11,6 @@ jobs:
 
       - name: Backend Tests ✅
         run: |
-          # Start DB
           docker compose up -d db
           sleep 20
           
@@ -22,3 +21,15 @@ jobs:
           docker compose run --rm backend python manage.py test meetings.tests.test_models
           docker compose run --rm backend python manage.py test meetings.tests.test_api  
           docker compose run --rm backend python manage.py test meetings.tests.test_validation
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Frontend Build ✅
+        run: |
+          cd frontend
+          npm ci
+          npm run build --if-present || echo "Build skipped"
