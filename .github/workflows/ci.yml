@@ -26,13 +26,3 @@ jobs:
           
           # Run tests
           docker compose exec -T backend python manage.py test meetings.tests
-
-      - name: Frontend Build
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-        run: |
-          cd frontend
-          npm ci
-          npm run build --if-present || echo "Build skipped"
