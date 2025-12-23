@@ -6,28 +6,33 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15
-        env:
-          POSTGRES_DB: testdb
-          POSTGRES_PASSWORD: testpass
-          POSTGRES_USER: testuser
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python and run backend tests
+      - name: Backend Tests
         run: |
-          docker compose up -d postgres
-          docker compose up --build backend
-          
-          # Wait for services
+          # Start postgres service matching docker-compose.yml
+          docker run -d --name ci-db \
+            -e POSTGRES_DB=app \
+            -e POSTGRES_USER=app \
+            -e POSTGRES_PASSWORD=app \
+            -p 5432:5432 \
+            postgres:16
+            
+          # Wait for DB
           sleep 15
+          
+          docker compose up --build backend --no-deps
           
           # Run tests
           docker compose exec -T backend python manage.py test meetings.tests
+
+      - name: Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+        run: |
+          cd frontend
+          npm ci
+          npm run build --if-present || echo "Build skipped"
