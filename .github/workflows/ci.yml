@@ -1,5 +1,4 @@
 name: CI
-
 on:
   push:
   pull_request:
@@ -24,8 +23,11 @@ jobs:
 
       - name: Setup Python and run backend tests
         run: |
-          pipx install docker-compose
-          docker-compose up -d postgres
-          docker-compose up --build backend
-          sleep 10
-          docker-compose exec -T backend python manage.py test meetings.tests
+          docker compose up -d postgres
+          docker compose up --build backend
+          
+          # Wait for services
+          sleep 15
+          
+          # Run tests
+          docker compose exec -T backend python manage.py test meetings.tests
