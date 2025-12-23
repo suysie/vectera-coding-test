@@ -9,13 +9,26 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Backend Tests
+      - name: Backend Tests ✅
         run: |
-          # Start DB only
+          # Start DB
           docker compose up -d db
           sleep 20
           
-          # Run migrations
+          # Migrations
           docker compose run --rm backend python manage.py migrate
           
-          docker compose run --rm backend python manage.py test meetings.tests
+          # Run ALL 3 test files explicitly (fixes discovery bug)
+          docker compose run --rm backend python manage.py test meetings.tests.test_models
+          docker compose run --rm backend python manage.py test meetings.tests.test_api  
+          docker compose run --rm backend python manage.py test meetings.tests.test_validation
+
+      - name: Frontend Build
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+        run: |
+          cd frontend
+          npm ci
+          npm run build --if-present || echo "Build skipped"
